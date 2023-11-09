@@ -1,3 +1,5 @@
+pub use self::error::{Error, Result};
+
 use axum::extract::{Path, Query};
 use axum::response::{Html, IntoResponse};
 use axum::routing::{get, get_service};
@@ -5,6 +7,9 @@ use axum::Router;
 use serde::Deserialize;
 use std::net::SocketAddr;
 use tower_http::services::ServeDir;
+
+mod error;
+mod web;
 
 #[derive(Debug, Deserialize)]
 struct HelloParams {
@@ -18,13 +23,14 @@ fn routes_hello() -> Router {
 }
 
 fn route_static() -> Router {
-    Router::new().nest_service("/", get_service(ServeDir::new("./static")))
+    Router::new().nest_service("/", get_service(ServeDir::new("./")))
 }
 
 #[tokio::main]
 async fn main() {
     let routes_all = Router::new()
         .merge(routes_hello())
+        .merge(web::routes_login::routes())
         .fallback_service(route_static());
     let address = SocketAddr::from(([127, 0, 0, 1], 9090));
     println!("\n--->> Starting server on http://{address}\n");
