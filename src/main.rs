@@ -1,4 +1,3 @@
-
 use std::net::SocketAddr;
 use axum::extract::Query;
 use serde::Deserialize;
@@ -25,8 +24,6 @@ async fn main() {
         .serve(routes_hello.into_make_service())
     .await
     .unwrap();
-
-
 }
 
 
@@ -38,3 +35,6 @@ async  fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse 
  Html(format!("<p>Welcome to awesome <strong>{name}</strong> rust<p>"))
 
 }
+
+
+
