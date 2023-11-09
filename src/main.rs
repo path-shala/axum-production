@@ -1,40 +1,32 @@
-use std::net::SocketAddr;
 use axum::extract::Query;
-use serde::Deserialize;
-use axum::Router;
 use axum::response::{Html, IntoResponse};
 use axum::routing::get;
+use axum::Router;
+use serde::Deserialize;
+use std::net::SocketAddr;
 
 #[derive(Debug, Deserialize)]
-struct HelloParams{
+struct HelloParams {
     name: Option<String>,
 }
 
 #[tokio::main]
 async fn main() {
+    let routes_hello = Router::new().route("/hello", get(handler_hello));
 
-    let routes_hello = Router::new().route(
-    "/hello",
-    get(handler_hello),
-    );
-
-    let address  =  SocketAddr::from(([127, 0, 0, 1], 9090));
+    let address = SocketAddr::from(([127, 0, 0, 1], 9090));
     println!("\n--->> Starting server on http://{address}\n");
     axum::Server::bind(&address)
         .serve(routes_hello.into_make_service())
-    .await
-    .unwrap();
+        .await
+        .unwrap();
 }
 
-
-async  fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse {
-
+async fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse {
     println!("--->> {:<12} handler_hello - {params:?}", "HANDLER");
 
     let name = params.name.as_deref().unwrap_or("World");
- Html(format!("<p>Welcome to awesome <strong>{name}</strong> rust<p>"))
-
+    Html(format!(
+        "<p>Welcome to awesome <strong>{name}</strong> rust<p>"
+    ))
 }
-
-
-
