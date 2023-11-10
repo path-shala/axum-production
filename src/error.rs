@@ -11,6 +11,7 @@ pub enum Error {
     AuthTokenNotFound,
     AuthFailTokenWrongFormat,
     AuthFailCtxNotInRequestExtension,
+    AuthFailNoAuthTokenCookie,
     TicketDeleteFailIdNotFound { id: u64 },
 }
 
