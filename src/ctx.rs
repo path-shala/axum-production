@@ -1,4 +1,4 @@
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct Ctx {
     user_id: u64,
 }
@@ -10,7 +10,7 @@ impl Ctx {
 }
 
 impl Ctx {
-    pub fn new(user_id : u64) -> Self {
-        Self{ user_id }
+    pub fn new(user_id: u64) -> Self {
+        Self { user_id }
     }
 }
