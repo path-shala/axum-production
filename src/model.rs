@@ -37,4 +37,17 @@ impl ModelController {
         store.push(Some(ticket));
         Ok(Ticket)
     }
+
+    pub async fn list_ticket(&self, id: u64) -> Result<Vec<Ticket>> {
+        let mut store = self.tickets_store.lock().unwrap;
+        let tickets = store.iter().filter_map(|t| t.clone()).collect();
+        Ok(tickets)
+    }
+
+    pub async fn delete_ticket(&self, id: u64) -> Result<Ticket>{
+        let mut store = self.tickets_store.lock().unwrap;
+        let ticket = store.get_mut(id as usize).and_then(|t| t.take());
+        ticket.ok_or(Error::TicketDeleteFailIdNotFound{id});
+        Ok(ticket.unwrap())
+    }
 }
