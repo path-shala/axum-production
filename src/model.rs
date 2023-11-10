@@ -1,15 +1,13 @@
+use crate::{Error, Result};
+use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
-
-use serde::Serialize;
-
-use crate::error::{Error, Result};
 
 #[derive(Clone, Debug, Serialize)]
 pub struct Ticket {
-    pub id: u64,
-    pub title: String,
+	pub id: u64,
+	pub title: String,
 }
-
+#[derive(Deserialize)]
 pub struct TicketForCreate {
     pub title: String,
 }
@@ -20,11 +18,12 @@ pub struct ModelController {
 }
 
 impl ModelController {
-    pub async fn new() -> Result<Self> {
-        Ok(ModelController {
-            tickets_store: Arc::default(),
-        })
-    }
+	//important here to control the constructor. That makes it easy to swap the implementation out later.
+	pub async fn new() -> Result<Self> {
+		Ok(Self {
+			tickets_store: Arc::default(),
+		})
+	}
 }
 
 impl ModelController {
