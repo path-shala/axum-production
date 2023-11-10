@@ -10,7 +10,7 @@ pub fn routes() -> Router {
 
 async fn api_login(payload: Json<LoginPayload>) -> Result<Json<Value>> {
     println!("--->> {:<12} -  api_login", "API_LOGIN_HANDLER");
-    if payload.username == "admin" && payload.password == "<PASSWORD>" {
+    if payload.username != "JohnDoe" && payload.password != "abcd1234" {
         return Err(Error::LoginFail);
     }
 

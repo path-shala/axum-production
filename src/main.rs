@@ -1,9 +1,9 @@
 pub use self::error::{Error, Result};
 
 use axum::extract::{Path, Query};
-use axum::response::{Html, IntoResponse};
+use axum::response::{Html, IntoResponse, Response};
 use axum::routing::{get, get_service};
-use axum::Router;
+use axum::{middleware, Router};
 use serde::Deserialize;
 use std::net::SocketAddr;
 use tower_http::services::ServeDir;
@@ -31,6 +31,7 @@ async fn main() {
     let routes_all = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
+        .layer(middleware::map_response(main_response_mapper))
         .fallback_service(route_static());
     let address = SocketAddr::from(([127, 0, 0, 1], 9090));
     println!("\n--->> Starting server on http://{address}\n");
@@ -55,4 +56,11 @@ async fn handler_hello_2(Path(name): Path<String>) -> impl IntoResponse {
     Html(format!(
         "<p>Welcome to awesome <strong>{name}</strong> rust<p>"
     ))
+}
+
+async fn main_response_mapper(res: Response) -> Response {
+    println!("--->> {:<12} main_response_mapper", "RESPONSE_MAPPER");
+
+    println!();
+    res
 }
