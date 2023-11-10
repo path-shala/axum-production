@@ -7,16 +7,13 @@ use async_trait::async_trait;
 
 
 pub async fn mw_require_auth<B>(
-    cookies: Cookies,
+    ctx:Result<Ctx>,
     req: Request<B>,
     next: Next<B>,
 ) -> Result<Response> {
     println!("->> {:<12} - mw_require_auth", "MIDDLEWARE");
 
-    let auth_token = cookies.get(AUTH_TOKEN).map(|c| c.value().to_string());
-    auth_token
-        .ok_or(Error::AuthTokenNotFound)
-        .and_then(parse_token)?;
+    ctx?;
     Ok(next.run(req).await)
 }
 
