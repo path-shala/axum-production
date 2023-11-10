@@ -4,8 +4,8 @@ use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Debug, Serialize)]
 pub struct Ticket {
-	pub id: u64,
-	pub title: String,
+    pub id: u64,
+    pub title: String,
 }
 #[derive(Deserialize)]
 pub struct TicketForCreate {
@@ -18,12 +18,12 @@ pub struct ModelController {
 }
 
 impl ModelController {
-	//important here to control the constructor. That makes it easy to swap the implementation out later.
-	pub async fn new() -> Result<Self> {
-		Ok(Self {
-			tickets_store: Arc::default(),
-		})
-	}
+    //important here to control the constructor. That makes it easy to swap the implementation out later.
+    pub async fn new() -> Result<Self> {
+        Ok(Self {
+            tickets_store: Arc::default(),
+        })
+    }
 }
 
 impl ModelController {

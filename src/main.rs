@@ -1,3 +1,5 @@
+use crate::model::ModelController;
+
 pub use self::error::{Error, Result};
 
 use axum::extract::{Path, Query};
@@ -29,10 +31,13 @@ fn route_static() -> Router {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
+    let mc = ModelController::new().await?;
+
     let routes_all = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
+        .nest("/api", web::routes_tickets::routes(mc))
         .layer(middleware::map_response(main_response_mapper))
         .layer(CookieManagerLayer::new())
         .fallback_service(route_static());
@@ -42,6 +47,8 @@ async fn main() {
         .serve(routes_all.into_make_service())
         .await
         .unwrap();
+
+    Ok(())
 }
 
 async fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse {
