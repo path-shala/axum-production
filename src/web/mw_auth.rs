@@ -1,13 +1,12 @@
-use crate::{ctx::Ctx, web::AUTH_TOKEN, Error, Result};
+use crate::{ctx::Ctx, model::ModelController, web::AUTH_TOKEN, Error, Result};
 use axum::{
-    extract::FromRequestParts,
+    extract::{FromRequestParts, State},
     http::{request::Parts, Request},
     middleware::Next,
     response::Response,
-    RequestPartsExt,
 };
 use lazy_regex::regex_captures;
-use tower_cookies::Cookies;
+use tower_cookies::{Cookie, Cookies};
 // use crate::Error::AuthTokenNotFound;
 use async_trait::async_trait;
 
@@ -42,18 +41,36 @@ impl<S: Send + Sync> FromRequestParts<S> for Ctx {
     ) -> std::result::Result<Self, Self::Rejection> {
         println!("->> {:<12} - Ctx", "EXTRACTOR");
 
-        // Use the cookies extractor
-        let cookies = parts.extract::<Cookies>().await.unwrap();
-
-        // Same code as above
-        let auth_token = cookies.get(AUTH_TOKEN).map(|c| c.value().to_string());
-
-        let (user_id, _exp, _sign) = auth_token
-            .ok_or(Error::AuthFailNoAuthTokenCookie)
-            .and_then(parse_token)?;
+        parts
+            .extensions
+            .get::<Result<Ctx>>()
+            .ok_or(Error::AuthFailCtxNotInRequestExtension)?
+            .clone()
 
         // TODO: Token components validation (e.g. signature check etc. not part of this tutorial)
-
-        Ok(Ctx::new(user_id))
     }
+}
+
+pub async fn mw_ctx_resolver<B>(
+    _mc: State<ModelController>,
+    cookies: Cookies,
+    mut req: Request<B>,
+    next: Next<B>,
+) -> Result<Response> {
+    let auth_token = cookies.get(AUTH_TOKEN).map(|c| c.value().to_string());
+    let result_ctx = match auth_token
+        .ok_or(Error::AuthFailNoAuthTokenCookie)
+        .and_then(parse_token)
+    {
+        Ok((user_id, _exp, _sign)) => Ok(Ctx::new(user_id)),
+        Err(e) => Err(e),
+    };
+
+    if result_ctx.is_err() && !matches!(result_ctx, Err(Error::AuthFailNoAuthTokenCookie)) {
+        cookies.remove(Cookie::named(AUTH_TOKEN));
+    }
+
+    req.extensions_mut().insert(result_ctx);
+
+    Ok(next.run(req).await)
 }
