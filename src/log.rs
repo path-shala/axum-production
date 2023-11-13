@@ -37,8 +37,8 @@ pub async fn log_request(
     client_error: Option<ClientError>,
 ) -> Result<()> {
     let now = SystemTime::now();
-	let now: DateTime<Utc> = now.into();
-	let now = now.to_rfc3339();
+    let now: DateTime<Utc> = now.into();
+    let now = now.to_rfc3339();
     // let _timestamp = SystemTime::now()
     //     .duration_since(SystemTime::UNIX_EPOCH)
     //     .unwrap()
