@@ -1,7 +1,7 @@
 use crate::ctx::Ctx;
 use crate::error::Error;
 use crate::error::{ClientError, Result};
-use axum::http::{Method,  Uri};
+use axum::http::{Method, Uri};
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -12,8 +12,8 @@ use uuid::Uuid;
 #[skip_serializing_none]
 #[derive(Serialize)]
 struct RequestLogLine {
-    uuid: String,      
-    timestamp: String, 
+    uuid: String,
+    timestamp: String,
 
     // User and context attributes
     user_id: Option<u64>,
@@ -56,7 +56,7 @@ pub async fn log_request(
         error_type,
         error_data,
     };
-println!("   ->> log_request: \n{}", json!(log_line));
+    println!("   ->> log_request: \n{}", json!(log_line));
 
     Ok(())
 }
