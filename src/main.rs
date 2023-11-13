@@ -109,7 +109,7 @@ async fn main_response_mapper(
         });
 
     let client_error = client_status_error.unzip().1;
-    log_request(uuid, req_method, uri, ctx, service_error, client_error).await;
+    let _ = log_request(uuid, req_method, uri, ctx, service_error, client_error).await;
     println!("   ->> server log line - {uuid} - Error: {service_error:?}");
     println!();
     error_response.unwrap_or(res)

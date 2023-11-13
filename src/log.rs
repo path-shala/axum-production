@@ -36,10 +36,13 @@ pub async fn log_request(
     service_error: Option<&Error>,
     client_error: Option<ClientError>,
 ) -> Result<()> {
-    let timestamp = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .unwrap()
-        .as_millis();
+    let now = SystemTime::now();
+	let now: DateTime<Utc> = now.into();
+	let now = now.to_rfc3339();
+    // let _timestamp = SystemTime::now()
+    //     .duration_since(SystemTime::UNIX_EPOCH)
+    //     .unwrap()
+    //     .as_millis();
 
     let error_type = service_error.map(|se| se.as_ref().to_string());
     let error_data = serde_json::to_value(service_error)
@@ -48,7 +51,7 @@ pub async fn log_request(
 
     let log_line = RequestLogLine {
         uuid: uuid.to_string(),
-        timestamp: timestamp.to_string(),
+        timestamp: now,
         user_id: ctx.map(|c| c.user_id()),
         req_path: uri.to_string(),
         req_method: req_method.to_string(),
