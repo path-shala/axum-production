@@ -2,21 +2,12 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use serde::Serialize;
 
 pub type Result<T> = core::result::Result<T, Error>;
-#[derive(Debug, strum_macros::AsRefStr)]
-#[allow(non_camel_case_types)]
-pub enum ClientError {
-    LOGIN_FAIL,
-    NO_AUTH,
-    INVALID_PARAMETERS,
-    SERVICE_ERROR,
-    AUTH_FAIL,
-    AUTH_FAIL_TOKEN_WRONG_FORMAT,
-    AUTH_FAIL_CTX_NOT_IN_REQUEST_EXTENSION,
-}
 
-#[derive(Debug, Clone, strum_macros::AsRefStr)]
+#[derive(Debug, Clone, Serialize, strum_macros::AsRefStr)]
+#[serde(tag = "type", content = "data")]
 pub enum Error {
     LoginFail,
     AuthFailNoAuthTokenCookie,
@@ -47,4 +38,17 @@ impl Error {
             }
         }
     }
+}
+
+#[derive(Debug, Serialize, strum_macros::AsRefStr)]
+#[serde(tag = "type", content = "data")]
+#[allow(non_camel_case_types)]
+pub enum ClientError {
+    LOGIN_FAIL,
+    NO_AUTH,
+    INVALID_PARAMETERS,
+    SERVICE_ERROR,
+    AUTH_FAIL,
+    AUTH_FAIL_TOKEN_WRONG_FORMAT,
+    AUTH_FAIL_CTX_NOT_IN_REQUEST_EXTENSION,
 }
