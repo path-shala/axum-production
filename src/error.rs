@@ -6,9 +6,12 @@ use serde::Serialize;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
+
 #[derive(Debug, Clone, Serialize, strum_macros::AsRefStr)]
 #[serde(tag = "type", content = "data")]
 pub enum Error {
+    ConfigMissingEnv(&'static str),
+
     LoginFail,
     AuthFailNoAuthTokenCookie,
     AuthFailCtxNotInRequestExtension,
